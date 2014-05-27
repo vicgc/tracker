@@ -1,3 +1,5 @@
+"""Marker detection with OpenCV"""
+
 import cv2
 import numpy as np
 
