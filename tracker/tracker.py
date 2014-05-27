@@ -104,7 +104,7 @@ class Marker:
         return x, y
 
 
-def find_markers(img):
+def find_markers(img, with_id=None):
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray = cv2.medianBlur(gray, 5)
@@ -144,6 +144,13 @@ def find_markers(img):
         if not valid_marker:
             continue
 
-        markers.append(Marker(marker_id, contour, polygon, rotations))
+        if with_id is None:
+            markers.append(Marker(marker_id, contour, polygon, rotations))
+        elif with_id == marker_id:
+            return Marker(marker_id, contour, polygon, rotations)
 
     return markers
+
+
+def find_marker_with_id(img, with_id):
+    return find_markers(img, with_id)
