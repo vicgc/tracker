@@ -7,8 +7,9 @@ from marker import Marker
 SQUARE_PX = 60
 WIDTH = SQUARE_PX * 5
 HEIGHT = SQUARE_PX * 5
-CLOCKW_TRANSFORM = np.float32([[0, 0], [WIDTH, 0], [WIDTH, HEIGHT], [0, HEIGHT]])
-ACLOCKW_TRANSFORM = np.float32([[0, 0], [0, HEIGHT], [WIDTH, HEIGHT], [WIDTH, 0]])
+
+TRANSFORM = {'clockwise': np.float32([[0, 0], [WIDTH, 0], [WIDTH, HEIGHT], [0, HEIGHT]]),
+             'aclockwise': np.float32([[0, 0], [0, HEIGHT], [WIDTH, HEIGHT], [WIDTH, 0]])}
 
 VALID_MARKERS = [
     [[1, 0, 1], [0, 0, 0], [0, 0, 1]],
@@ -89,12 +90,12 @@ def find_markers(img, with_id=False):
             continue
 
         if oriented_clockwise(polygon):
-            trans_mat = CLOCKW_TRANSFORM
+            orientation = 'clockwise'
         else:
-            trans_mat = ACLOCKW_TRANSFORM
+            orientation = 'aclockwise'
 
         polygon_fl = np.float32(polygon)
-        transform = cv2.getPerspectiveTransform(polygon_fl, trans_mat)
+        transform = cv2.getPerspectiveTransform(polygon_fl, TRANSFORM[orientation])
         sq_marker = cv2.warpPerspective(gray, transform, (WIDTH, HEIGHT))
         __, sq_marker_bin = cv2.threshold(sq_marker, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
