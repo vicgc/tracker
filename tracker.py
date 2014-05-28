@@ -8,8 +8,14 @@ SQUARE_PX = 60
 WIDTH = SQUARE_PX * 5
 HEIGHT = SQUARE_PX * 5
 
-TRANSFORM = {'clockwise': np.float32([[0, 0], [WIDTH, 0], [WIDTH, HEIGHT], [0, HEIGHT]]),
-             'aclockwise': np.float32([[0, 0], [0, HEIGHT], [WIDTH, HEIGHT], [WIDTH, 0]])}
+TRANSFORM = {'clockwise': np.float32([[0, 0],
+                                      [WIDTH, 0],
+                                      [WIDTH, HEIGHT],
+                                      [0, HEIGHT]]),
+             'aclockwise': np.float32([[0, 0],
+                                       [0, HEIGHT],
+                                       [WIDTH, HEIGHT],
+                                       [WIDTH, 0]])}
 
 VALID_MARKERS = [
     [[1, 0, 1], [0, 0, 0], [0, 0, 1]],
@@ -74,7 +80,8 @@ def find_markers(img, with_id=False):
     gray = cv2.medianBlur(gray, 5)
 
     __, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
-    contours, __ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours, __ = cv2.findContours(thresh, cv2.RETR_TREE,
+                                    cv2.CHAIN_APPROX_SIMPLE)
 
     markers = list()
 
@@ -89,11 +96,17 @@ def find_markers(img, with_id=False):
         if not_quadrilateral(polygon):
             continue
 
-        orientation = 'clockwise' if oriented_clockwise(polygon) else 'aclockwise'
+        if oriented_clockwise(polygon):
+            orientation = 'clockwise'
+        else:
+            orientation = 'aclockwise'
+
         polygon_fl = np.float32(polygon)
-        transform = cv2.getPerspectiveTransform(polygon_fl, TRANSFORM[orientation])
+        transform = cv2.getPerspectiveTransform(polygon_fl,
+                                                TRANSFORM[orientation])
         sq_marker = cv2.warpPerspective(gray, transform, (WIDTH, HEIGHT))
-        __, sq_marker_bin = cv2.threshold(sq_marker, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        __, sq_marker_bin = cv2.threshold(sq_marker, 0, 255,
+                                          cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
         if no_black_border(sq_marker_bin):
             continue
