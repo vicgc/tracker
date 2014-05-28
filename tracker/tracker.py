@@ -87,9 +87,7 @@ class Marker:
         self.position = self.__pos()
         self.cx, self.cy = self.position
         self.x, self.y = self.__corners()
-
         self.major_axis = self.__major_axis()
-        self.direction = None  # TODO
 
     def __pos(self):
         moments = cv2.moments(self.contour)
@@ -109,6 +107,21 @@ class Marker:
         x = self.x[(4-r) % 4] + int((self.x[(5-r) % 4] - self.x[(4-r) % 4]) / 2)
         y = self.y[(4-r) % 4] + int((self.y[(5-r) % 4] - self.y[(4-r) % 4]) / 2)
         return x, y
+
+    def angle_to_point(self, point):
+        a = np.array(self.major_axis)
+        b = np.array(self.position)
+        c = np.array(point)
+
+        phi = np.arctan2(*(a - b))
+        if phi < 0:
+            phi += 2*np.pi
+
+        rho = np.arctan2(*(c - b))
+        if rho < 0:
+            rho += 2*np.pi
+
+        return round(np.degrees(rho - phi))
 
 
 def find_markers(img, with_id=None):
