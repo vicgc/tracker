@@ -74,7 +74,7 @@ def validate_marker(marker):
     return False, None, None
 
 
-def find_markers(img, with_id=False):
+def find_markers(img, with_id=None):
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray = cv2.medianBlur(gray, 5)
@@ -118,6 +118,8 @@ def find_markers(img, with_id=False):
             continue
 
         if not with_id:
+            markers.append(Marker(marker_id, contour, polygon, rotations))
+        elif with_id is list and marker_id in with_id:
             markers.append(Marker(marker_id, contour, polygon, rotations))
         elif with_id == marker_id:
             return Marker(marker_id, contour, polygon, rotations)
