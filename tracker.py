@@ -49,29 +49,6 @@ def oriented_clockwise(polygon):
     return cross > 0
 
 
-def parse_marker(marker):
-    marker_data = np.zeros(shape=(3, 3), dtype=np.int)
-
-    # perhaps rewrite this to check for avg. color
-    start = SQUARE_PX + SQUARE_PX/2
-    stop = SQUARE_PX * 4
-    for i, x in enumerate(range(start, stop, SQUARE_PX)):
-        for j, y in enumerate(range(start, stop, SQUARE_PX)):
-            if marker[x, y] == 255:
-                marker_data[i, j] = 1
-
-    return marker_data
-
-
-def validate_marker(marker):
-    for i, valid_marker in enumerate(VALID_MARKERS):
-        for rotations in xrange(4):
-            if (marker == np.rot90(valid_marker, rotations)).all():
-                return True, MARKER_ID[i], rotations
-
-    return False, None, None
-
-
 class Marker:
     def __init__(self, marker_id, contour, polygon, rotations=0):
         self.id = marker_id
@@ -118,6 +95,29 @@ class Marker:
 
         return round(np.degrees(rho - phi))
 
+    @staticmethod
+    def parse(marker):
+        marker_data = np.zeros(shape=(3, 3), dtype=np.int)
+
+        # perhaps rewrite this to check for avg. color
+        start = SQUARE_PX + SQUARE_PX/2
+        stop = SQUARE_PX * 4
+        for i, x in enumerate(range(start, stop, SQUARE_PX)):
+            for j, y in enumerate(range(start, stop, SQUARE_PX)):
+                if marker[x, y] == 255:
+                    marker_data[i, j] = 1
+
+        return marker_data
+
+    @staticmethod
+    def validate(marker):
+        for i, valid_marker in enumerate(VALID_MARKERS):
+            for rotations in xrange(4):
+                if (marker == np.rot90(valid_marker, rotations)).all():
+                    return True, MARKER_ID[i], rotations
+
+        return False, None, None
+
 
 def find_markers(img, with_id=None):
 
@@ -153,8 +153,8 @@ def find_markers(img, with_id=None):
         if no_black_border(sq_marker_bin):
             continue
 
-        marker = parse_marker(sq_marker_bin)
-        valid_marker, marker_id, rotations = validate_marker(marker)
+        marker = Marker.parse(sq_marker_bin)
+        valid_marker, marker_id, rotations = Marker.validate(marker)
 
         if not valid_marker:
             continue
