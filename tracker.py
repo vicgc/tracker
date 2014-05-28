@@ -49,10 +49,10 @@ def oriented_clockwise(polygon):
 def parse_marker(marker):
     marker_data = np.zeros(shape=(3, 3), dtype=np.int)
 
-    # perhaps rewrite this to check for avg. color
-    for i, x in enumerate(range(90, 240, 60)):
-        for j, y in enumerate(range(90, 240, 60)):
-            if marker[x, y] == 255:
+    for i, x in enumerate(range(60, 240, 60)):
+        for j, y in enumerate(range(60, 240, 60)):
+            mean = np.mean(marker[x:x+60, y:y+60])
+            if mean > 200:
                 marker_data[i, j] = 1
 
     return marker_data
