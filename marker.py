@@ -17,9 +17,9 @@ class Marker:
     @property
     def position(self):
         moments = cv2.moments(self.contour)
-        cx = int(moments['m10']/moments['m00'])
-        cy = int(moments['m01']/moments['m00'])
-        return cx, cy
+        x = int(moments['m10']/moments['m00'])
+        y = int(moments['m01']/moments['m00'])
+        return x, y
 
     @property
     def corners(self):
