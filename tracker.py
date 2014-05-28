@@ -33,8 +33,8 @@ def not_quadrilateral(points):
 def no_black_border(region):
     left = cv2.mean(region[0:60])
     right = cv2.mean(region[240:300])
-    top = cv2.mean(region[:, 0:60])
-    bottom = cv2.mean(region[:, 240:300])
+    top = cv2.mean(region[60:240, 0:60])
+    bottom = cv2.mean(region[60:240, 240:300])
     mean = np.mean(left + right + top + bottom)
     return mean > 10
 
