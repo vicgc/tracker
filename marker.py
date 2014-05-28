@@ -1,10 +1,10 @@
-"""Marker class which gets designated to all valid markers"""
-
 import cv2
 import numpy as np
 
 
 class Marker:
+    """Marker class which gets designated to all valid markers"""
+
     def __init__(self, marker_id, contour, polygon, rotations=0):
         self.id = marker_id
         self.contour = contour
@@ -16,9 +16,9 @@ class Marker:
 
     @property
     def position(self):
-        moments = cv2.moments(self.contour)
-        x = int(moments['m10']/moments['m00'])
-        y = int(moments['m01']/moments['m00'])
+        m = cv2.moments(self.contour)
+        x = int(m['m10']/m['m00'])
+        y = int(m['m01']/m['m00'])
         return x, y
 
     @property

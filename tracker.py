@@ -40,13 +40,9 @@ def no_black_border(region):
 
 
 def oriented_clockwise(polygon):
-    x0 = polygon[0][0][0]
-    y0 = polygon[0][0][1]
-    x1 = polygon[1][0][0]
-    y1 = polygon[1][0][1]
-    x2 = polygon[2][0][0]
-    y2 = polygon[2][0][1]
-    cross = (x1-x0)*(y2-y0) - (x2-x0)*(y1-y0)
+    x, y = np.hsplit(np.squeeze(polygon), 2)
+    x, y = map(np.squeeze, [x, y])
+    cross = (x[1]-x[0])*(y[2]-y[0]) - (x[2]-x[0])*(y[1]-y[0])
     return cross > 0
 
 
