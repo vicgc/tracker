@@ -10,6 +10,17 @@ HEIGHT = SQUARE_PX * 5
 CLOCKW_TRANSFORM = np.float32([[0, 0], [WIDTH, 0], [WIDTH, HEIGHT], [0, HEIGHT]])
 ACLOCKW_TRANSFORM = np.float32([[0, 0], [0, HEIGHT], [WIDTH, HEIGHT], [WIDTH, 0]])
 
+VALID_MARKERS = [
+    [[1, 0, 1], [0, 0, 0], [0, 0, 1]],
+    [[1, 0, 1], [0, 0, 1], [0, 0, 1]],
+    [[1, 0, 1], [0, 0, 0], [0, 1, 1]],
+    [[1, 1, 1], [0, 0, 0], [0, 0, 1]],
+    [[1, 1, 1], [0, 0, 1], [0, 0, 1]],
+    [[1, 1, 1], [0, 0, 0], [0, 1, 1]]
+]
+
+MARKER_ID = [1, 2, 3, 4, 5, 6]
+
 
 def small_area(region):
     return cv2.contourArea(region) < 1e2
@@ -37,6 +48,27 @@ def oriented_clockwise(polygon):
     y2 = polygon[2][0][1]
     cross = (x1-x0)*(y2-y0) - (x2-x0)*(y1-y0)
     return cross > 0
+
+
+def parse_marker(marker):
+    marker_data = np.zeros(shape=(3, 3), dtype=np.int)
+
+    # perhaps rewrite this to check for avg. color
+    for i, x in enumerate(range(90, 240, 60)):
+        for j, y in enumerate(range(90, 240, 60)):
+            if marker[x, y] == 255:
+                marker_data[i, j] = 1
+
+    return marker_data
+
+
+def validate_marker(marker):
+    for i, valid_marker in enumerate(VALID_MARKERS):
+        for rotations in xrange(4):
+            if (marker == np.rot90(valid_marker, rotations)).all():
+                return True, MARKER_ID[i], rotations
+
+    return False, None, None
 
 
 def find_markers(img, with_id=False):
@@ -73,8 +105,8 @@ def find_markers(img, with_id=False):
         if no_black_border(sq_marker_bin):
             continue
 
-        marker = Marker.parse(sq_marker_bin)
-        valid_marker, marker_id, rotations = Marker.validate(marker)
+        marker = parse_marker(sq_marker_bin)
+        valid_marker, marker_id, rotations = validate_marker(marker)
 
         if not valid_marker:
             continue
