@@ -49,14 +49,21 @@ def oriented_clockwise(polygon):
     return cross > 0
 
 
+def pixels():
+    start = SQUARE_PX + SQUARE_PX/2
+    stop = SQUARE_PX * 4
+    for i, x in enumerate(range(start, stop, SQUARE_PX)):
+        for j, y in enumerate(range(start, stop, SQUARE_PX)):
+            yield i, j, x, y
+
+
 def parse_marker(marker):
     marker_data = np.zeros(shape=(3, 3), dtype=np.int)
 
     # perhaps rewrite this to check for avg. color
-    for i, row in enumerate(range(90, 240, SQUARE_PX)):
-        for j, col in enumerate(range(90, 240, SQUARE_PX)):
-            if marker[row, col] == 255:
-                marker_data[i, j] = 1
+    for i, j, x, y in pixels():
+        if marker[x, y] == 255:
+            marker_data[i, j] = 1
 
     return marker_data
 
