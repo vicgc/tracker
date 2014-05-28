@@ -89,11 +89,7 @@ def find_markers(img, with_id=False):
         if not_quadrilateral(polygon):
             continue
 
-        if oriented_clockwise(polygon):
-            orientation = 'clockwise'
-        else:
-            orientation = 'aclockwise'
-
+        orientation = 'clockwise' if oriented_clockwise(polygon) else 'aclockwise'
         polygon_fl = np.float32(polygon)
         transform = cv2.getPerspectiveTransform(polygon_fl, TRANSFORM[orientation])
         sq_marker = cv2.warpPerspective(gray, transform, (WIDTH, HEIGHT))
