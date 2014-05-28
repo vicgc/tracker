@@ -23,10 +23,8 @@ class Marker:
 
     @property
     def corners(self):
-        x, y = list(), list()
-        for i in xrange(4):
-            x.append(self.polygon[i][0][0])
-            y.append(self.polygon[i][0][1])
+        x, y = np.hsplit(np.squeeze(self.polygon), 2)
+        x, y = map(np.squeeze, [x, y])
         return x, y
 
     @property
