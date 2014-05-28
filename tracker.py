@@ -83,7 +83,7 @@ def find_markers(img, with_id=None):
     contours, __ = cv2.findContours(thresh, cv2.RETR_TREE,
                                     cv2.CHAIN_APPROX_SIMPLE)
 
-    markers = list()
+    markers = dict()
 
     for contour in contours:
 
@@ -118,9 +118,11 @@ def find_markers(img, with_id=None):
             continue
 
         if not with_id:
-            markers.append(Marker(marker_id, contour, polygon, rotations))
+            markers[marker_id] = Marker(marker_id, contour, polygon, rotations)
+
         elif with_id is list and marker_id in with_id:
-            markers.append(Marker(marker_id, contour, polygon, rotations))
+            markers[marker_id] = Marker(marker_id, contour, polygon, rotations)
+
         elif with_id == marker_id:
             return Marker(marker_id, contour, polygon, rotations)
 
