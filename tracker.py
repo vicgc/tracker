@@ -8,15 +8,6 @@ SQUARE_PX = 60
 WIDTH = SQUARE_PX * 5
 HEIGHT = SQUARE_PX * 5
 
-TRANSFORM = {'clockwise': np.float32([[0, 0],
-                                      [WIDTH, 0],
-                                      [WIDTH, HEIGHT],
-                                      [0, HEIGHT]]),
-             'aclockwise': np.float32([[0, 0],
-                                       [0, HEIGHT],
-                                       [WIDTH, HEIGHT],
-                                       [WIDTH, 0]])}
-
 VALID_MARKERS = {
     1: [[1, 0, 1], [0, 0, 0], [0, 0, 1]],
     2: [[1, 0, 1], [0, 0, 1], [0, 0, 1]],
@@ -51,14 +42,24 @@ def oriented_clockwise(polygon):
     return cross > 0
 
 
+def transform_matrix(polygon):
+    if oriented_clockwise(polygon):
+        return np.float32([[0, 0], [WIDTH, 0], [WIDTH, HEIGHT], [0, HEIGHT]])
+    else:
+        return np.float32([[0, 0], [0, HEIGHT], [WIDTH, HEIGHT], [WIDTH, 0]])
+
+
 def parse_marker(marker):
     marker_data = np.zeros(shape=(3, 3), dtype=np.int)
 
-    for i, x in enumerate(range(60, 240, 60)):
-        for j, y in enumerate(range(60, 240, 60)):
-            mean = np.mean(marker[x:x+60, y:y+60])
-            if mean > 200:
-                marker_data[i, j] = 1
+    squares = ((x, y, i, j)
+               for i, x in enumerate(range(60, 240, 60))
+               for j, y in enumerate(range(60, 240, 60)))
+
+    for x, y, i, j in squares:
+        mean = np.mean(marker[x:x+60, y:y+60])
+        if mean > 200:
+            marker_data[i, j] = 1
 
     return marker_data
 
@@ -94,14 +95,9 @@ def find_markers(img):
         if not_quadrilateral(polygon):
             continue
 
-        if oriented_clockwise(polygon):
-            orientation = 'clockwise'
-        else:
-            orientation = 'aclockwise'
-
         polygon_fl = np.float32(polygon)
-        transform = cv2.getPerspectiveTransform(polygon_fl,
-                                                TRANSFORM[orientation])
+        tr_matrix = transform_matrix(polygon)
+        transform = cv2.getPerspectiveTransform(polygon_fl, tr_matrix)
         sq_marker = cv2.warpPerspective(gray, transform, (WIDTH, HEIGHT))
         __, sq_marker_bin = cv2.threshold(sq_marker, 0, 255,
                                           cv2.THRESH_BINARY + cv2.THRESH_OTSU)
