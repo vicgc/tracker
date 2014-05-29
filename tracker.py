@@ -31,8 +31,7 @@ def no_black_border(region):
     right = cv2.mean(region[240:300])
     top = cv2.mean(region[60:240, 0:60])
     bottom = cv2.mean(region[60:240, 240:300])
-    mean = np.mean(left + right + top + bottom)
-    return mean > 10
+    return np.mean(left + right + top + bottom) > 10
 
 
 def oriented_clockwise(polygon):
@@ -52,14 +51,10 @@ def transform_matrix(polygon):
 def parse_marker(marker):
     marker_data = np.zeros(shape=(3, 3), dtype=np.int)
 
-    squares = ((x, y, i, j)
-               for i, x in enumerate(range(60, 240, 60))
-               for j, y in enumerate(range(60, 240, 60)))
-
-    for x, y, i, j in squares:
-        mean = np.mean(marker[x:x+60, y:y+60])
-        if mean > 200:
-            marker_data[i, j] = 1
+    for i, x in enumerate(range(60, 240, 60)):
+        for j, y in enumerate(range(60, 240, 60)):
+            if np.mean(marker[x:x+60, y:y+60]) > 200:
+                marker_data[i, j] = 1
 
     return marker_data
 
@@ -74,7 +69,6 @@ def validate_marker(marker):
 
 
 def find_markers(img):
-
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray = cv2.medianBlur(gray, 5)
 
@@ -85,7 +79,6 @@ def find_markers(img):
     markers = dict()
 
     for contour in contours:
-
         if small_area(contour):
             continue
 
