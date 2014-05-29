@@ -16,12 +16,9 @@ class Marker:
 
     @property
     def position(self):
-        try:
-            m = cv2.moments(self.contour)
-            x = int(m['m10']/m['m00'])
-            y = int(m['m01']/m['m00'])
-        except (TypeError, ValueError):
-            x = y = None
+        m = cv2.moments(self.contour)
+        x = int(m['m10']/m['m00'])
+        y = int(m['m01']/m['m00'])
         return x, y
 
     @property
