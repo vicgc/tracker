@@ -34,6 +34,13 @@ class Marker:
         x, y = map(f, [self.x, self.y])
         return x, y
 
+    @property
+    def minor_axis(self):
+        r = self.rotations
+        f = lambda z: z[(5-r) % 4] + int((z[(6-r) % 4] - z[(5-r) % 4]) / 2)
+        x, y = map(f, [self.x, self.y])
+        return x, y
+
     def angle_to_point(self, point):
         a, b, c = map(np.array, [self.major_axis, self.position, point])
 
