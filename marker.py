@@ -45,7 +45,7 @@ class Marker:
 
     @property
     def area_vec(self):
-        pass
+        raise NotImplementedError
 
     def angle_to_point(self, pt):
         maj, pos, pt = map(np.array, [self.major_axis, self.position, pt])
