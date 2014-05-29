@@ -47,18 +47,13 @@ class Marker:
     def area_vec(self):
         pass
 
-    def angle_to_point(self, point):
-        a, b, c = map(np.array, [self.major_axis, self.position, point])
+    def angle_to_point(self, pt):
+        maj, pos, pt = map(np.array, [self.major_axis, self.position, pt])
 
-        phi = np.arctan2(*(a - b))
-        rho = np.arctan2(*(c - b))
+        phi = np.arctan2(*(maj - pos))
+        rho = np.arctan2(*(pt - pos))
 
-        if phi < 0:
-            phi += 2*np.pi
+        f = lambda x: x + 2*np.pi if x < 0 else x
+        phi, rho = map(f, [phi, rho])
 
-        if rho < 0:
-            rho += 2*np.pi
-
-        angle = round(np.degrees(rho - phi))
-
-        return angle
+        return round(np.degrees(rho - phi))
