@@ -16,9 +16,12 @@ class Marker:
 
     @property
     def position(self):
-        m = cv2.moments(self.contour)
-        x = int(m['m10']/m['m00'])
-        y = int(m['m01']/m['m00'])
+        try:
+            m = cv2.moments(self.contour)
+            x = int(m['m10']/m['m00'])
+            y = int(m['m01']/m['m00'])
+        except (TypeError, ValueError):
+            x = y = None
         return x, y
 
     @property
@@ -30,21 +33,22 @@ class Marker:
     @property
     def major_axis(self):
         r = self.rotations
-        x = self.x[(4-r) % 4] + int((self.x[(5-r) % 4] - self.x[(4-r) % 4]) / 2)
-        y = self.y[(4-r) % 4] + int((self.y[(5-r) % 4] - self.y[(4-r) % 4]) / 2)
+        f = lambda z: z[(4-r) % 4] + int((z[(5-r) % 4] - z[(4-r) % 4]) / 2)
+        x, y = map(f, [self.x, self.y])
         return x, y
 
     def angle_to_point(self, point):
-        a = np.array(self.major_axis)
-        b = np.array(self.position)
-        c = np.array(point)
+        a, b, c = map(np.array, [self.major_axis, self.position, point])
 
         phi = np.arctan2(*(a - b))
+        rho = np.arctan2(*(c - b))
+
         if phi < 0:
             phi += 2*np.pi
 
-        rho = np.arctan2(*(c - b))
         if rho < 0:
             rho += 2*np.pi
 
-        return round(np.degrees(rho - phi))
+        angle = round(np.degrees(rho - phi))
+
+        return angle
