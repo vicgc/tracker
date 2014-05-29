@@ -17,16 +17,14 @@ TRANSFORM = {'clockwise': np.float32([[0, 0],
                                        [WIDTH, HEIGHT],
                                        [WIDTH, 0]])}
 
-VALID_MARKERS = [
-    [[1, 0, 1], [0, 0, 0], [0, 0, 1]],
-    [[1, 0, 1], [0, 0, 1], [0, 0, 1]],
-    [[1, 0, 1], [0, 0, 0], [0, 1, 1]],
-    [[1, 1, 1], [0, 0, 0], [0, 0, 1]],
-    [[1, 1, 1], [0, 0, 1], [0, 0, 1]],
-    [[1, 1, 1], [0, 0, 0], [0, 1, 1]]
-]
-
-MARKER_ID = [1, 2, 3, 4, 5, 6]
+VALID_MARKERS = {
+    1: [[1, 0, 1], [0, 0, 0], [0, 0, 1]],
+    2: [[1, 0, 1], [0, 0, 1], [0, 0, 1]],
+    3: [[1, 0, 1], [0, 0, 0], [0, 1, 1]],
+    4: [[1, 1, 1], [0, 0, 0], [0, 0, 1]],
+    5: [[1, 1, 1], [0, 0, 1], [0, 0, 1]],
+    6: [[1, 1, 1], [0, 0, 0], [0, 1, 1]]
+}
 
 
 def small_area(region):
@@ -66,15 +64,15 @@ def parse_marker(marker):
 
 
 def validate_marker(marker):
-    for i, valid_marker in enumerate(VALID_MARKERS):
+    for marker_id, valid_marker in VALID_MARKERS.iteritems():
         for rotations in xrange(4):
-            if (marker == np.rot90(valid_marker, rotations)).all():
-                return True, MARKER_ID[i], rotations
+            if np.array_equal(marker, np.rot90(valid_marker, rotations)):
+                return True, marker_id, rotations
 
     return False, None, None
 
 
-def find_markers(img, with_id=None):
+def find_markers(img):
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray = cv2.medianBlur(gray, 5)
@@ -117,17 +115,6 @@ def find_markers(img, with_id=None):
         if not valid_marker:
             continue
 
-        if not with_id:
-            markers[marker_id] = Marker(marker_id, contour, polygon, rotations)
-
-        elif with_id is list and marker_id in with_id:
-            markers[marker_id] = Marker(marker_id, contour, polygon, rotations)
-
-        elif with_id == marker_id:
-            return Marker(marker_id, contour, polygon, rotations)
+        markers[marker_id] = Marker(marker_id, contour, polygon, rotations)
 
     return markers
-
-
-def find_marker_with_id(img, with_id):
-    return find_markers(img, with_id)
