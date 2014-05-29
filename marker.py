@@ -26,8 +26,7 @@ class Marker:
 
     @property
     def corners(self):
-        x, y = np.hsplit(np.squeeze(self.polygon), 2)
-        x, y = map(np.squeeze, [x, y])
+        x, y = map(np.squeeze, np.hsplit(np.squeeze(self.polygon), 2))
         return x, y
 
     @property
