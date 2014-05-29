@@ -14,6 +14,9 @@ class Marker:
         self.cx, self.cy = self.position
         self.x, self.y = self.corners
 
+    def __str__(self):
+        return str(self.id)
+
     @property
     def position(self):
         m = cv2.moments(self.contour)
