@@ -41,6 +41,10 @@ class Marker:
         x, y = map(f, [self.x, self.y])
         return x, y
 
+    @property
+    def area_vec(self):
+        pass
+
     def angle_to_point(self, point):
         a, b, c = map(np.array, [self.major_axis, self.position, point])
 
