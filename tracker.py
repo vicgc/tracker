@@ -31,12 +31,14 @@ def no_black_border(region):
     right = cv2.mean(region[240:300])
     top = cv2.mean(region[60:240, 0:60])
     bottom = cv2.mean(region[60:240, 240:300])
-    return np.mean(left + right + top + bottom) > 10
+    mean = np.mean(left + right + top + bottom)
+    return mean > 10
 
 
 def oriented_clockwise(polygon):
     x, y = map(np.squeeze, np.hsplit(np.squeeze(polygon), 2))
-    return (x[1]-x[0])*(y[2]-y[0]) - (x[2]-x[0])*(y[1]-y[0]) > 0
+    cross = (x[1]-x[0])*(y[2]-y[0]) - (x[2]-x[0])*(y[1]-y[0])
+    return cross > 0
 
 
 def transform_matrix(polygon):
@@ -49,8 +51,8 @@ def transform_matrix(polygon):
 def parse_marker(marker):
     marker_data = np.zeros(shape=(3, 3), dtype=np.int)
 
-    for i, x in enumerate(range(60, 240, 60)):
-        for j, y in enumerate(range(60, 240, 60)):
+    for i, x in enumerate(xrange(60, 181, 60)):
+        for j, y in enumerate(xrange(60, 181, 60)):
             if np.mean(marker[x:x+60, y:y+60]) > 200:
                 marker_data[i, j] = 1
 
