@@ -96,9 +96,16 @@ def find_markers(img):
         polygon_fl = np.float32(polygon)
         tr_matrix = transform_matrix(polygon)
         transform = cv2.getPerspectiveTransform(polygon_fl, tr_matrix)
+
+        # FIXME: Choose algorithm
+        # Reuse thresholded image,
+        # -- OR --
+        # Run warpPerspective on "gray" threshold the result again.
+        # In the latter case, the call to thresh.copy() is redundant.
         sq_marker = cv2.warpPerspective(thresh, transform, (WIDTH, HEIGHT))
         #__, sq_marker_bin = cv2.threshold(sq_marker, 0, 255,
         #                                  cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
 
         if no_black_border(sq_marker):
             continue
