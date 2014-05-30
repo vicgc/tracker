@@ -35,10 +35,8 @@ def no_black_border(region):
 
 
 def oriented_clockwise(polygon):
-    x, y = np.hsplit(np.squeeze(polygon), 2)
-    x, y = map(np.squeeze, [x, y])
-    cross = (x[1]-x[0])*(y[2]-y[0]) - (x[2]-x[0])*(y[1]-y[0])
-    return cross > 0
+    x, y = map(np.squeeze, np.hsplit(np.squeeze(polygon), 2))
+    return (x[1]-x[0])*(y[2]-y[0]) - (x[2]-x[0])*(y[1]-y[0]) > 0
 
 
 def transform_matrix(polygon):
