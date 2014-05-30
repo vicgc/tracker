@@ -51,19 +51,25 @@ def transform_matrix(polygon):
 def parse_marker(marker):
     marker_data = np.zeros(shape=(3, 3), dtype=np.int)
 
-    for i, x in enumerate(xrange(60, 181, 60)):
-        for j, y in enumerate(xrange(60, 181, 60)):
-            if np.mean(marker[x:x+60, y:y+60]) > 200:
-                marker_data[i, j] = 1
+    squares = ((x, y, i, j)
+               for i, x in enumerate(xrange(60, 181, 60))
+               for j, y in enumerate(xrange(60, 181, 60)))
+
+    for x, y, i, j in squares:
+        if np.mean(marker[x:x+60, y:y+60]) > 200:
+            marker_data[i, j] = 1
 
     return marker_data
 
 
 def validate_marker(marker):
-    for marker_id, valid_marker in VALID_MARKERS.iteritems():
-        for rotations in xrange(4):
-            if np.array_equal(marker, np.rot90(valid_marker, rotations)):
-                return True, marker_id, rotations
+    valid_markers = ((marker_id, valid_marker, rotations)
+                     for marker_id, valid_marker in VALID_MARKERS.iteritems()
+                     for rotations in xrange(4))
+
+    for marker_id, valid_marker, rotations in valid_markers:
+        if np.array_equal(marker, np.rot90(valid_marker, rotations)):
+            return True, marker_id, rotations
 
     return False, None, None
 
