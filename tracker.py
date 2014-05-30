@@ -75,10 +75,10 @@ def validate_marker(marker):
 
 def find_markers(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    gray = cv2.medianBlur(gray, 5)
-
-    __, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
-    contours, __ = cv2.findContours(thresh, cv2.RETR_TREE,
+    #blur = cv2.medianBlur(gray, 5)
+    blur = cv2.GaussianBlur(gray, (3, 3), 0)
+    __, thresh = cv2.threshold(blur, 100, 255, cv2.THRESH_BINARY)
+    contours, __ = cv2.findContours(thresh.copy(), cv2.RETR_TREE,
                                     cv2.CHAIN_APPROX_SIMPLE)
 
     markers = dict()
@@ -96,14 +96,14 @@ def find_markers(img):
         polygon_fl = np.float32(polygon)
         tr_matrix = transform_matrix(polygon)
         transform = cv2.getPerspectiveTransform(polygon_fl, tr_matrix)
-        sq_marker = cv2.warpPerspective(gray, transform, (WIDTH, HEIGHT))
-        __, sq_marker_bin = cv2.threshold(sq_marker, 0, 255,
-                                          cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        sq_marker = cv2.warpPerspective(thresh, transform, (WIDTH, HEIGHT))
+        #__, sq_marker_bin = cv2.threshold(sq_marker, 0, 255,
+        #                                  cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-        if no_black_border(sq_marker_bin):
+        if no_black_border(sq_marker):
             continue
 
-        marker = parse_marker(sq_marker_bin)
+        marker = parse_marker(sq_marker)
         valid_marker, marker_id, rotations = validate_marker(marker)
 
         if not valid_marker:
